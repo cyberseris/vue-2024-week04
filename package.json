@@ -1,0 +1,32 @@
+{
+  "name": "vue-2024-week04",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "deploy": "vite build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "axios": "^1.7.5",
+    "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1",
+    "pinia": "^2.1.7",
+    "sweetalert2": "^11.12.4",
+    "uuid": "^10.0.0",
+    "validator": "^13.12.0",
+    "vue": "^3.4.29",
+    "vue-router": "^4.3.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.23.0",
+    "gh-pages": "^6.1.1",
+    "sass-embedded": "^1.77.8",
+    "vite": "^5.3.1"
+  }
+}
