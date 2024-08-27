@@ -18,7 +18,7 @@
         <label class="formControls_label" for="pwd">再次輸入密碼</label>
         <input class="formControls_input" type="password" name="confirmPassword" id="confirmPassword" placeholder="請再次輸入密碼" v-model="confirmPassword" required>
         <input class="formControls_btnSubmit" type="button" @click.prevent="signUp" value="註冊帳號">
-        <a class="formControls_btnLink" href="/">登入</a>
+        <a class="formControls_btnLink" href="#/">登入</a>
       </form>
     </div>
   </div>
