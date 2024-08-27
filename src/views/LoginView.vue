@@ -13,7 +13,8 @@
         <label class="formControls_label" for="pwd">密碼</label>
         <input class="formControls_input" type="password" name="pwd" id="pwd" placeholder="請輸入密碼" v-model="password" required>
         <button class="formControls_btnSubmit"  @click.prevent="signIn">登入</button>
-        <a class="formControls_btnLink" href="#/register">註冊帳號</a>
+        <!-- <a class="formControls_btnLink" href="#/register">註冊帳號</a> -->
+        <RouterLink class="formControls_btnLink" to="/register">註冊帳號</RouterLink>
       </form>
     </div>
   </div>
