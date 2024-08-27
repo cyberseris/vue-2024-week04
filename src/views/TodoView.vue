@@ -211,7 +211,7 @@
           icon: "success"
         })
         setTimeout(()=>{
-          window.location.reload();
+          getTodos()
         }, 1000)
       }else{
         Swal.fire({
@@ -219,9 +219,6 @@
           text: "新增待辦事項失敗",
           icon: "error"
         })
-        setTimeout(()=>{
-        window.location.reload();
-        }, 1000)
       }
     })
     .catch(error => {
@@ -244,7 +241,7 @@
           icon: "success"
         })
         setTimeout(()=>{
-          window.location.reload();
+          getTodos()
         }, 1000)
       }
     })
@@ -278,7 +275,7 @@
                 icon: "success"
               })
               setTimeout(()=>{
-                window.location.reload();
+                getTodos()
               }, 1000)
             }
           })
