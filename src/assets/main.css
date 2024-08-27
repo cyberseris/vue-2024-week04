@@ -111,7 +111,8 @@ img {
 }
 
 .side {
-  width: 386px;
+  width: 600px;
+  font-size: 40px;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
