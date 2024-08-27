@@ -191,8 +191,8 @@
           })
         }
       })
-      .catch(err => {
-        console.log("Error: ", err)
+      .catch(error => {
+        console.log("Error: ", error)
       })
     }
   }
