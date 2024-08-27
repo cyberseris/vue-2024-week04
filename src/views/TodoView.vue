@@ -310,8 +310,12 @@
     expiresStatus();
     getTodos();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    nickname.value = urlParams.get('name')
+    const hash = window.location.hash;
+    const hashParams = new URLSearchParams(hash.substring(hash.indexOf('?')));
+    nickname.value = hashParams.get('name');
+
+    /*     const urlParams = new URLSearchParams(window.location.search);
+    nickname.value = urlParams.get('name') */
   })
 
   $(document).on("click", ".todo-tab", function(e){
