@@ -138,23 +138,23 @@
   }
 
   const signOut = async () => {
-  await axios.post(`${url}/users/sign_out`, {}, {
-    headers: {
-        Authorization: token
+    try{
+      const res = await axios.post(`${url}/users/sign_out`, {}, {
+        headers: {
+            Authorization: token
+        }
+      })
+
+      if(res.data.status){
+        deleteCookie('hexschoolTodo')
+        showAlert("登出成功","","success","確認");
+        setTimeout(()=>{
+          router.push('/');
+        }, 1000)
+      }
+    }catch(err){
+      console.log("Error: ", err)
     }
-  })
-  .then(res => {
-    if(res.data.status){
-      deleteCookie('hexschoolTodo')
-      showAlert("登出成功","","success","確認");
-      setTimeout(()=>{
-        router.push('/');
-      }, 1000)
-    }
-  })
-  .catch(err => {
-    console.log("Error: ", err)
-  })
   }
 
   const expiresStatus = () => {
@@ -171,12 +171,13 @@
 
   const getTodos = async () => {
     if(token){
-      await axios.get(`${url}/todos`, {
-        headers:{
-          Authorization:token
-        }
-      })
-      .then(res => {
+      try{
+        const res = await axios.get(`${url}/todos`, {
+          headers:{
+            Authorization:token
+          }
+        })
+
         if(res.data.status){
           todoList.value = res.data.data  
           countTodo.value = todoList.value.filter(todo => !todo.status).length
@@ -184,54 +185,52 @@
             todo.isEditable = false
           })
         }
-      })
-      .catch(err => {
+      }catch(err){
         console.log("Err: ", err)
-      })
+      }
     }
   }
 
   const addTodo = async () => {
-    await axios.post(`${url}/todos`, {content: content.value}, {
-      headers:{
-        Authorization:token
-      }
-    })
-    .then(res => {
+    try{
+      const res = await axios.post(`${url}/todos`, {content: content.value}, {
+        headers:{
+          Authorization:token
+        }
+      })
+
       if(res.data.status){
         showAlert("新增成功","成功新增待辦事項","success","確認")
         setTimeout(()=>{
           getTodos()
         }, 1000)
-      }else{
-        showAlert("新增失敗","新增待辦事項失敗","error","確認")
       }
-    })
-    .catch(err => {
+    }catch(err){
+      showAlert("新增失敗","新增待辦事項失敗","error","確認")
       console.log("Error: ", err)
-    })
+    }
   }
 
   const updateTodo = async (todo) => {
     isLoading.value = true
-    await axios.put(`${url}/todos/${todo.id}`, {content:todo.content}, {
-      headers: {
-        Authorization: token
-      }
-    })
-    .then(res => {
-      if(res.data.status){
-        getTodos() 
-        showAlert("更新成功","成功更新待辦事項","success","確認")
-        setTimeout(()=>{isLoading.value = false}, 3000)
-        setTimeout(()=>{
-          getTodos()
-        }, 1000)
-      }
-    })
-    .catch(err => {
+
+    try{
+        const res = await axios.put(`${url}/todos/${todo.id}`, {content:todo.content}, {
+          headers: {
+            Authorization: token
+          }
+        })
+        if(res.data.status){
+          getTodos() 
+          showAlert("更新成功","成功更新待辦事項","success","確認")
+          setTimeout(()=>{isLoading.value = false}, 3000)
+          setTimeout(()=>{
+            getTodos()
+          }, 1000)
+        }
+    }catch(err){
       console.log("Error:　", err)
-    })
+    }
   }
 
   const deleteTodo = async (id) => {
@@ -244,45 +243,43 @@
       cancelButtonColor: "#d33",
       confirmButtonText: "刪除",
       cancelButtonText: "取消"
-    }).then((result) => {
+    }).then(async (result) => {
       if(result.isConfirmed){
-        axios.delete(`${url}/todos/${id}`,{
+        try{
+          const res = await axios.delete(`${url}/todos/${id}`,{
             headers:{
               Authorization:token
             }
           })
-          .then(res => {
-            if(res.data.status){
-              showAlert("刪除成功","成功刪除待辦事項","success","確認")
-              setTimeout(()=>{
-                getTodos()
-              }, 1000)
-            }
-          })
-          .catch(err => {
-            console.log("Error: ", err)
-          })
+
+          if(res.data.status){
+            showAlert("刪除成功","成功刪除待辦事項","success","確認")
+            setTimeout(()=>{
+              getTodos()
+            }, 1000)
+          }
+        }catch(err){
+          console.log("Error: ", err)
+        }
       }
     });
   }
 
   const updateStatus = async(todo) => {
-    axios.patch(`${url}/todos/${todo.id}/toggle`, {
-      status:!todo.status
-    }, {
-      headers:{
-        Authorization:token
-      }
-    })
-    .then(async res=>{
-      if(res.status){
-        await getTodos()
-        countTodo.value = todoList.value.filter(item => !item.status).length
-      }
-    })
-    .catch(err => {
+    try{
+        const res = await axios.patch(`${url}/todos/${todo.id}/toggle`, {status:!todo.status},
+          {
+            headers:{
+              Authorization:token
+            }
+          })
+        if(res.data.status){
+          await getTodos()
+          countTodo.value = todoList.value.filter(item => !item.status).length
+        }
+    }catch(err){
       console.log("Error: ", err)
-    })
+    }
   }
 
   const statusLoading = () => {

@@ -34,27 +34,27 @@ const url = 'https://todolist-api.hexschool.io';
 
 const signIn = async () => {
     if(account.value && password.value){
-      await axios.post(`${url}/users/sign_in`, {
+      try{
+        const res = await axios.post(`${url}/users/sign_in`, {
         email: account.value,
         password: password.value
       })
-      .then(res => {
-        if(res.data.status){
-          let date = new Date();
-          date.setTime(date.getTime()+60*60*1*1000);
-          date = date.toUTCString();
-          document.cookie = `hexschoolTodo=${res.data.token}`+"expires="+date+";";
-          showAlert("登入成功","","success","確認")
+    
+      if(res.data.status){
+        let date = new Date();
+        date.setTime(date.getTime()+60*60*1*1000);
+        date = date.toUTCString();
+        document.cookie = `hexschoolTodo=${res.data.token}`+"expires="+date+";";
+        showAlert("登入成功","","success","確認")
 
-          setTimeout(()=>{
-            router.push(`/todo?name=${res.data.nickname}`)
-          }, 1000)
-        }
-      })
-      .catch(err => {
+        setTimeout(()=>{
+          router.push(`/todo?name=${res.data.nickname}`)
+        }, 1000)
+      }
+      }catch(err){
         showAlert("登入失敗","帳號密碼驗證錯誤","error","確認");
         console.log("Error: ", err)
-      })
+      }
     }else{
       showAlert("輸入錯誤","資料不得為空","error","確認");
     }

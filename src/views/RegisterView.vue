@@ -85,32 +85,33 @@
       flag = false
       showAlert("註冊失敗","密碼至少包含數字、英文大小寫、特殊符號，且密碼長度大於 8 位數","error","確認")
     }else if(flag){
-        await axios.post(`${url}/users/sign_up`, {
+      try{
+        const res =await axios.post(`${url}/users/sign_up`, {
           email: account.value,
           password: password.value,
           nickname: nickname.value
         })
-        .then((res) => {
-          if(res.data.status){
-            showAlert("註冊成功","恭喜您註冊成功","success","確認")
-            setTimeout(()=>{
-              router.push("/");
-            }, 1000)  
-          }
-        })
-        .catch(error => {
+
+        if(res.data.status){
+        showAlert("註冊成功","恭喜您註冊成功","success","確認")
+        setTimeout(()=>{
+          router.push("/");
+        }, 1000)  
+        }
+      }catch(err){
+        flag = true
+        if(err.response.data.message=="用戶已存在"){
           flag = true
-          if(error.response.data.message=="用戶已存在"){
-            flag = true
-            showAlert("註冊失敗","用戶已存在","error","確認")
-          }else if(error.response.data.message=="email 格式錯誤"){
-            flag = true
-            showAlert("註冊失敗","email 格式錯誤","error","確認")
-          }else{
-            flag = true
-            showAlert("註冊失敗","輸入錯誤","error","確認")
-          }
-        })
+          showAlert("註冊失敗","用戶已存在","error","確認")
+        }else if(err.response.data.message=="email 格式錯誤"){
+          flag = true
+          showAlert("註冊失敗","email 格式錯誤","error","確認")
+        }else{
+          flag = true
+          showAlert("註冊失敗","輸入錯誤","error","確認")
+          console.log("Error: ", err)
+        }
+      }
     }else{
       flag = true
       showAlert("輸入錯誤","資料輸入錯誤，請重新輸入。帳號、密碼或暱稱不能相同。密碼至少包含數字、英文大小寫、特殊符號，且密碼長度請大於 8 位數。","error","確認")           
