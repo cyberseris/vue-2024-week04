@@ -1,6 +1,6 @@
 <template>
 <!-- sign up -->
-<div id="signUpPage" class="bg-yellow">
+<div id="signUpPage" class="bg-yellow y-scroll">
   <div class="conatiner signUpPage vhContainer">
     <div class="side">
       <a href="#"><img class="logoImg" src="../../public/logo.png" alt=""></a>
@@ -10,13 +10,14 @@
       <form class="formControls" action="index.html">
         <h2 class="formControls_txt">註冊帳號</h2>
         <label class="formControls_label" for="email">Email</label>
-        <input class="formControls_input" type="email" id="email" name="email" placeholder="請輸入 email" v-model="account" required>
+        <input class="formControls_input" type="email" id="email" name="email" placeholder="請輸入 email, ex: test@test.com" v-model="account" required>
         <label class="formControls_label" for="name">您的暱稱</label>
         <input class="formControls_input" type="text" name="name" id="name" placeholder="請輸入您的暱稱" v-model="nickname">
         <label class="formControls_label" for="pwd">密碼</label>
-        <input class="formControls_input" type="password" name="pwd" id="pwd" placeholder="請輸入密碼" v-model="password" required>
+        <input class="formControls_input" type="password" name="pwd" id="pwd" placeholder="至少包含數字、英文大小寫、特殊符號" v-model="password" required>
         <label class="formControls_label" for="pwd">再次輸入密碼</label>
-        <input class="formControls_input" type="password" name="confirmPassword" id="confirmPassword" placeholder="請再次輸入密碼" v-model="confirmPassword" required>
+        <input class="formControls_input" type="password" name="confirmPassword" id="confirmPassword" placeholder="至少包含數字、英文大小寫、特殊符號" v-model="confirmPassword" required>
+        
         <input class="formControls_btnSubmit" type="button" @click.prevent="signUp" value="註冊帳號">
         <!-- <a class="formControls_btnLink" href="#/">登入</a> -->
         <RouterLink class="formControls_btnLink" to="/">登入</RouterLink>
@@ -28,10 +29,10 @@
 
 <script setup>
   import axios from 'axios'
-  import Swal from 'sweetalert2'
-  import validator from 'validator';
+  import validator from 'validator'
+  import showAlert from '@/utils/alert.js'
   import { ref } from 'vue'
-  import { useRouter, RouterLink } from 'vue-router';
+  import { useRouter, RouterLink } from 'vue-router'
 
   const router = useRouter()
   const account = ref('')
@@ -66,83 +67,61 @@
   }
 
   const signUp = async () => {
-    if(password.value!=confirmPassword.value){
-      Swal.fire({
-        title: "註冊失敗",
-        text: "兩次密碼輸入不同",
-        icon: "error"
-      })
-    }
-
-    if(account.value == password.value || account.value == nickname.value || password.value == nickname.value){
+    console.log("password.value!=confirmPassword.value",password.value,confirmPassword.value)
+    if(!account.value || !password.value || !nickname.value){
+      showAlert("註冊失敗","欄位不得為空","error","確認")
+    }else if(!validator.isEmail(account.value)){
       flag = false
-      Swal.fire({
-        title: "註冊失敗",
-        text: "帳號、密碼或暱稱不能相同",
-        icon: "error"
-      })
-    }
-    if(!validator.isEmail(account.value)){
+      console.log("isEmail", flag)
+      showAlert("註冊失敗","帳號格式不符","error","確認")
+    }else if(password.value != confirmPassword.value){
       flag = false
-      Swal.fire({
-        title: "註冊失敗",
-        text: "帳號格式不符",
-        icon: "error"
-      })
-    }
-
-    if(checkPasswordStrength(password.value)<4){
+      console.log("兩次密碼輸入不同")
+      showAlert("註冊失敗","兩次密碼輸入不同","error","確認")
+    }else if(account.value == password.value || account.value == nickname.value || password.value == nickname.value){
       flag = false
-      Swal.fire({
-        title: "註冊失敗",
-        text: "密碼至少包含數字、英文大小寫、特殊符號",
-        icon: "error"
-      })
-    }
-
-    console.log("account.value && password.value && nickname.value && flag", account.value, password.value, nickname.value, flag)
-    if(account.value && password.value && nickname.value && flag){
-        await axios.post(`${url}/users/sign_up`,{
+      showAlert("註冊失敗","帳號、密碼或暱稱不能相同","error","確認")
+    }else if(checkPasswordStrength(password.value)<4){
+      flag = false
+      showAlert("註冊失敗","密碼至少包含數字、英文大小寫、特殊符號，且密碼長度大於 8 位數","error","確認")
+    }else if(flag){
+        await axios.post(`${url}/users/sign_up`, {
           email: account.value,
           password: password.value,
           nickname: nickname.value
         })
         .then((res) => {
           if(res.data.status){
-            Swal.fire({
-              title: "註冊成功",
-              text: "恭喜您註冊成功",
-              icon: "success"
-            })
+            showAlert("註冊成功","恭喜您註冊成功","success","確認")
             setTimeout(()=>{
               router.push("/");
             }, 1000)  
           }
         })
         .catch(error => {
+          flag = true
           if(error.response.data.message=="用戶已存在"){
-            Swal.fire({
-              title: "註冊失敗",
-              text: "用戶已存在",
-              icon: "error"})
+            flag = true
+            showAlert("註冊失敗","用戶已存在","error","確認")
           }else if(error.response.data.message=="email 格式錯誤"){
-            Swal.fire({
-              title: "註冊失敗",
-              text: "email 格式錯誤",
-              icon: "error"})
+            flag = true
+            showAlert("註冊失敗","email 格式錯誤","error","確認")
           }else{
-            Swal.fire({
-              title: "註冊失敗",
-              text: "輸入錯誤",
-              icon: "error"})
+            flag = true
+            showAlert("註冊失敗","輸入錯誤","error","確認")
           }
         })
     }else{
-        Swal.fire({
-        title: "輸入錯誤",
-        text: "資料輸入錯誤，請重新輸入",
-        icon: "error"
-      })           
+      flag = true
+      showAlert("輸入錯誤","資料輸入錯誤，請重新輸入。帳號、密碼或暱稱不能相同。密碼至少包含數字、英文大小寫、特殊符號，且密碼長度請大於 8 位數。","error","確認")           
     }
   }
 </script>
+
+<style>
+.y-scroll{
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+</style>

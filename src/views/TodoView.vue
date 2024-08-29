@@ -34,11 +34,12 @@
                 <input class="me-auto" type="text" v-model="todo.content" v-if=(todo.isEditable)>
               </label>
               <div class="d-flex w-160 pb-15"  v-if=(!isEditable)>
-                <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo. isEditable; isEditable = !isEditable">編輯</button>
+                <!-- <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo.isEditable; isEditable = !isEditable">編輯</button> -->
+                <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo.isEditable; isEditable = !isEditable; statusLoading()" :disabled="isLoading">編輯</button>
                 <button type="button" class="btn btn-outline-danger btn-sm me-3"  @click.prevent="deleteTodo(todo.id)">刪除</button>
               </div>
               <div v-else class="d-flex w-160 pb-15">
-                <button class="btn btn-outline-secondary btn-sm me-1"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;updateTodo(todo);">確認</button>
+                <button class="btn btn-outline-secondary btn-sm me-1"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;updateTodo(todo);" :disabled="isLoading">確認</button>
                 <button class="btn btn-outline-secondary btn-sm me-3"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;">取消</button>
               </div>
             </li>
@@ -56,11 +57,11 @@
                 <input class="me-auto" type="text" v-model="todo.content" v-if=(todo.isEditable)>
               </label>
               <div class="d-flex w-160 pb-15"  v-if=(!isEditable)>
-                <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo. isEditable; isEditable = !isEditable">編輯</button>
+                <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo.isEditable; isEditable = !isEditable" :disabled="isLoading">編輯</button>
                 <button type="button" class="btn btn-outline-danger btn-sm me-3"  @click.prevent="deleteTodo(todo.id)">刪除</button>
               </div>
               <div v-else class="d-flex w-160 pb-15">
-                <button class="btn btn-outline-secondary btn-sm me-1"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;updateTodo(todo);">確認</button>
+                <button class="btn btn-outline-secondary btn-sm me-1"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;updateTodo(todo);" :disabled="isLoading">確認</button>
                 <button class="btn btn-outline-secondary btn-sm me-3"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;">取消</button>
               </div>
             </li>
@@ -79,12 +80,12 @@
               </label>
 
               <div class="d-flex w-160 pb-15"  v-if=(!isEditable)>
-                <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo. isEditable; isEditable = !isEditable">編輯</button>
+                <button class="btn btn-outline-primary btn-sm ms-auto me-1"  @click.prevent="todo.isEditable = !todo.isEditable; isEditable = !isEditable" :disabled="isLoading">編輯</button>
                 <button type="button" class="btn btn-outline-danger btn-sm me-3"  @click.prevent="deleteTodo(todo.id)">刪除</button>
               </div>
 
               <div v-else class="d-flex w-160 pb-15">
-                <button class="btn btn-outline-secondary btn-sm me-1"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;updateTodo(todo);">確認</button>
+                <button class="btn btn-outline-secondary btn-sm me-1"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;updateTodo(todo);" :disabled="isLoading">確認</button>
                 <button class="btn btn-outline-secondary btn-sm me-3"  @click.prevent="todo.isEditable = !todo.isEditable;isEditable = !isEditable;">取消</button>
               </div>
             </li>
@@ -100,11 +101,12 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue'
   import axios from 'axios'
+  import showAlert from '@/utils/alert.js'
   import Swal from 'sweetalert2'
   import $ from 'jquery'
   import { useRouter } from 'vue-router';
+  import { ref, onMounted } from 'vue'
 
   const router = useRouter();
   const todoList = ref([])
@@ -112,6 +114,7 @@
   const countTodo = ref(0)
   const nickname = ref('')
   const isEditable = ref(false)
+  const isLoading = ref(false)
   const url = 'https://todolist-api.hexschool.io';
   
   let token = ''
@@ -137,18 +140,13 @@
   const signOut = async () => {
   await axios.post(`${url}/users/sign_out`, {}, {
     headers: {
-            Authorization: token
+        Authorization: token
     }
   })
   .then(res => {
     if(res.data.status){
       deleteCookie('hexschoolTodo')
-
-      Swal.fire({
-        title: "登出成功",
-        icon: "success"
-      })
-
+      showAlert("登出成功","","success","確認");
       setTimeout(()=>{
         router.push('/');
       }, 1000)
@@ -164,11 +162,7 @@
     const currentTime = new Date()
     if(currentTime > expiresTime){
       deleteCookie('hexschoolTodo')
-      Swal.fire({
-        title: "驗證失敗",
-        text: "登入超時，請重新登入系統",
-        icon: "error"
-      })
+      showAlert("驗證失敗","登入超時，請重新登入系統","error","確認")
       setTimeout(()=>{
         router.push('/');
       }, 1000)
@@ -191,42 +185,35 @@
           })
         }
       })
-      .catch(error => {
-        console.log("Error: ", error)
+      .catch(err => {
+        console.log("Err: ", err)
       })
     }
   }
 
   const addTodo = async () => {
-    await axios.post(`${url}/todos`, {content: content.value} , {
+    await axios.post(`${url}/todos`, {content: content.value}, {
       headers:{
         Authorization:token
       }
     })
     .then(res => {
       if(res.data.status){
-        Swal.fire({
-          title: "新增成功",
-          text: "成功新增待辦事項",
-          icon: "success"
-        })
+        showAlert("新增成功","成功新增待辦事項","success","確認")
         setTimeout(()=>{
           getTodos()
         }, 1000)
       }else{
-        Swal.fire({
-          title: "新增失敗",
-          text: "新增待辦事項失敗",
-          icon: "error"
-        })
+        showAlert("新增失敗","新增待辦事項失敗","error","確認")
       }
     })
-    .catch(error => {
-      console.log("Error: ", error)
+    .catch(err => {
+      console.log("Error: ", err)
     })
   }
 
   const updateTodo = async (todo) => {
+    isLoading.value = true
     await axios.put(`${url}/todos/${todo.id}`, {content:todo.content}, {
       headers: {
         Authorization: token
@@ -235,11 +222,8 @@
     .then(res => {
       if(res.data.status){
         getTodos() 
-        Swal.fire({
-          title: "更新成功",
-          text: "成功更新待辦事項",
-          icon: "success"
-        })
+        showAlert("更新成功","成功更新待辦事項","success","確認")
+        setTimeout(()=>{isLoading.value = false}, 3000)
         setTimeout(()=>{
           getTodos()
         }, 1000)
@@ -269,11 +253,7 @@
           })
           .then(res => {
             if(res.data.status){
-              Swal.fire({
-                title: "刪除成功",
-                text: "成功刪除待辦事項",
-                icon: "success"
-              })
+              showAlert("刪除成功","成功刪除待辦事項","success","確認")
               setTimeout(()=>{
                 getTodos()
               }, 1000)
@@ -303,6 +283,14 @@
     .catch(err => {
       console.log("Error: ", err)
     })
+  }
+
+  const statusLoading = () => {
+    isLoading.value = true;
+
+    setTimeout(()=>{
+      isLoading.value = false;
+    }, 2000)
   }
 
   onMounted(() => {
